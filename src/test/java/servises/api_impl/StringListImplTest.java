@@ -25,6 +25,22 @@ class StringListImplTest {
     }
 
     @Test
+    // Расширяется массив каждый раз на 10 ячеек.
+    // Исходный сделал с емкостью 2
+    // При добавлении вышел за пределы, + 10. Итого теперь 12 ячеек в массиве.
+
+    // Объект создал напрямую через класс реализации, так как мне был нужен метод getSize() (Истинный размер массива),
+    // который не прописан в интерфейсе StringList
+    void add_With_Extends() {
+        StringListImpl list=new StringListImpl(2);
+        list.add("First");
+        list.add("Second");
+        list.add("Third");
+
+        assertEquals(12, list.getSize());
+    }
+
+    @Test
     void add_Thow_ArrayIndexOutOfBoundsException() {
         list = new StringListImpl(1);
         list.add("First");

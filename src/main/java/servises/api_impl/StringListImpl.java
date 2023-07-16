@@ -1,14 +1,12 @@
 package servises.api_impl;
 
 import servises.api.StringList;
-
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class StringListImpl implements StringList {
-    private final int DEFOULT_SIZE = 10;
-    private int size = DEFOULT_SIZE;
+    private final int DEFAULT_SIZE = 10;
+    private int size = DEFAULT_SIZE;
     private String[] strings;
     private int length = 0;
 
@@ -19,13 +17,22 @@ public class StringListImpl implements StringList {
     }
 
     public StringListImpl() {
-        strings = new String[DEFOULT_SIZE];
-
+        strings = new String[DEFAULT_SIZE];
     }
 
     @Override
     public String add(String item) {
-        AvailabilityInRange();
+        if (item==null || item.isBlank()) {
+            throw new NullPointerException("Объект null или пустой");
+        }
+
+        // динамическое расширения массива, если он заполнен
+        if (length==size) {
+            String[] newArr=new String[size+ DEFAULT_SIZE];
+            System.arraycopy(strings,0,newArr,0,length);
+            strings=newArr;
+            size= newArr.length;
+        }
 
         for (int i = length; i < size; i++) {
             if (strings[i] == null) {
@@ -34,7 +41,6 @@ public class StringListImpl implements StringList {
                 break;
             }
         }
-
         return item;
     }
 
@@ -42,7 +48,6 @@ public class StringListImpl implements StringList {
     public String add(int index, String item) {
 
         AvailabilityInRange();
-
         checkIndexOfRange(index);
 
         for (int i = length; i > index; i--) {
@@ -57,6 +62,7 @@ public class StringListImpl implements StringList {
     @Override
     public String set(int index, String item) {
         checkIndexOfRange(index);
+
         strings[index] = item;
 
         return item;
@@ -108,7 +114,6 @@ public class StringListImpl implements StringList {
                 return i;
             }
         }
-
         return -1;
     }
 
@@ -120,14 +125,13 @@ public class StringListImpl implements StringList {
                 return i;
             }
         }
-
         return -1;
     }
 
     @Override
     public String get(int index) {
-        checkIndexOfRange(index);
 
+        checkIndexOfRange(index);
         return strings[index];
     }
 
@@ -165,10 +169,8 @@ public class StringListImpl implements StringList {
         if (!isEmpty()) {
             for (int i = length - 1; i >= 0; i--) {
                 strings[i] = null;
-
             }
         }
-
     }
 
     @Override
@@ -179,6 +181,20 @@ public class StringListImpl implements StringList {
             newStrings[i]=strings[i];
         }
         return newStrings;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(strings[i]);
+            sb.append(" | ");
+        }
+        return sb.toString();
+    }
+
+    public int getSize() {
+        return size;
     }
 
     // Проверка на допустимость вхождения в существующий диапазон индексов.
@@ -195,16 +211,4 @@ public class StringListImpl implements StringList {
             throw new ArrayIndexOutOfBoundsException("Массив переполнен!");
         }
     }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            sb.append(strings[i]);
-            sb.append(" | ");
-        }
-        return sb.toString();
-
-    }
-
 }
