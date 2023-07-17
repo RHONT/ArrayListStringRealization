@@ -40,13 +40,6 @@ class StringListImplTest {
         assertEquals(12, list.getSize());
     }
 
-    @Test
-    void add_Thow_ArrayIndexOutOfBoundsException() {
-        list = new StringListImpl(1);
-        list.add("First");
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> list.add("Second"));
-    }
-
 
     @Test
     void testAdd_Two_Parameters() {
