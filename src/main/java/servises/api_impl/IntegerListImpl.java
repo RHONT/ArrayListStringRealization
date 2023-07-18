@@ -3,7 +3,6 @@ package servises.api_impl;
 import servises.api.IntegerList;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -25,16 +24,13 @@ public class IntegerListImpl implements IntegerList {
 
     @Override
     public Integer add(Integer item) {
-        if (item==null) {
+        if (item == null) {
             throw new NullPointerException("Объект null или пустой");
         }
 
         // динамическое расширения массива, если он заполнен
-        if (length==size) {
-            Integer[] newArr=new Integer[size+ DEFAULT_SIZE];
-            System.arraycopy(integers,0,newArr,0,length);
-            integers =newArr;
-            size= newArr.length;
+        if (length == size) {
+            grow();
         }
 
         for (int i = length; i < size; i++) {
@@ -46,6 +42,7 @@ public class IntegerListImpl implements IntegerList {
         }
         return item;
     }
+
 
     @Override
     public Integer add(int index, Integer item) {
@@ -102,10 +99,11 @@ public class IntegerListImpl implements IntegerList {
 
     @Override
     public boolean contains(Integer item) {
-        sort();
-        int result= Arrays.binarySearch(toArray(),item);
 
-        return result>=0;
+        quickSortOptimize(integers);
+        int result = Arrays.binarySearch(toArray(), item);
+
+        return result >= 0;
     }
 
     @Override
@@ -179,7 +177,7 @@ public class IntegerListImpl implements IntegerList {
         Integer[] newStrings = new Integer[length];
 
         for (int i = 0; i < length; i++) {
-            newStrings[i]= integers[i];
+            newStrings[i] = integers[i];
         }
         return newStrings;
     }
@@ -187,15 +185,15 @@ public class IntegerListImpl implements IntegerList {
     @Override
     public void sort() {
 
-            for (int i = 1; i < length; i++) {
-                int temp = integers[i];
-                int j = i;
-                while (j > 0 && integers[j - 1] >= temp) {
-                    integers[j] = integers[j - 1];
-                    j--;
-                }
-                integers[j] = temp;
+        for (int i = 1; i < length; i++) {
+            int temp = integers[i];
+            int j = i;
+            while (j > 0 && integers[j - 1] >= temp) {
+                integers[j] = integers[j - 1];
+                j--;
             }
+            integers[j] = temp;
+        }
     }
 
     @Override
@@ -224,6 +222,70 @@ public class IntegerListImpl implements IntegerList {
     private void AvailabilityInRange() {
         if (size == length) {
             throw new ArrayIndexOutOfBoundsException("Массив переполнен!");
+        }
+    }
+
+    private void grow() {
+        Integer[] newArr = new Integer[(int) (size * 1.5d)];
+        System.arraycopy(integers, 0, newArr, 0, length);
+        integers = newArr;
+        size = newArr.length;
+    }
+
+    private void swapElements(Integer[] copy, int i, int minElementIndex) {
+        int temp = copy[i];
+        copy[i] = copy[minElementIndex];
+        copy[minElementIndex] = temp;
+    }
+
+    private void quickSortOptimize(Integer[] array) {
+        quickSortOptimize(array, 0, length-1);
+
+    }
+
+    private void quickSortOptimize(Integer[] array, int lo, int hi) {
+        if (hi - lo <= 32) {
+            insertionSort(array, lo, hi);
+            return;
+        }
+        int h = breakPartition(array, lo, hi);
+        quickSortOptimize(array, lo, h - 1);
+        quickSortOptimize(array, h + 1, hi);
+    }
+
+
+    private int breakPartition(Integer[] array, int lo, int hi) {
+        int i = lo + 1;
+        int supportElement = array[lo];
+        int j = hi;
+        for (; ; ) {
+            for (; i < hi && array[i] < supportElement; ) {
+                i += 1;
+            }
+            for (; array[j] > supportElement; ) {
+                j -= 1;
+            }
+            if (i >= j) {
+                break;
+            }
+            swapElements(array, i++, j--);
+        }
+        swapElements(array, lo, j);
+        return j;
+    }
+
+
+    private void insertionSort(Integer[] array, int begin, int end) {
+        for (int i = begin; i <= end; i++) {
+            int pasteElement = array[i];
+            int j;
+            for (j = i; j > begin; j--) {
+                if (array[j - 1] <= pasteElement) {
+                    break;
+                }
+                array[j] = array[j - 1];
+            }
+            array[j] = pasteElement;
         }
     }
 }

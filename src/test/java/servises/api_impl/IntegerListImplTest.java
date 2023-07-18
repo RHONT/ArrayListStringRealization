@@ -38,7 +38,7 @@ class IntegerListImplTest {
         list.add(2);
         list.add(3);
 
-        assertEquals(12, list.getSize());
+        assertEquals(3, list.getSize());
     }
 
 
